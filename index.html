@@ -40,7 +40,7 @@
         <p class="lead">يواقيت | المسلم يجمع مواقيت الصلاة، القرآن، الأذكار، القبلة والتنبيهات في تجربة واحدة هادئة وواضحة.</p>
         <div class="actions">
           <a class="download-button" id="download-btn" href="https://github.com/esraamohan78-source/yawaqit-download/releases/latest" download>
-            <span class="download-icon">↓</span><span><b>تنزيل التطبيق</b><small id="download-meta">Android APK · جارٍ جلب الحجم…</small></span>
+            <span class="download-icon">↓</span><span><b>تحميل المصدر الكامل</b><small id="download-meta">ZIP · جارٍ جلب الحجم…</small></span>
           </a>
           <a class="release-link" href="https://github.com/esraamohan78-source/yawaqit-download/releases/latest" target="_blank" rel="noopener">فتح صفحة GitHub Release ↗</a>
         </div>
@@ -81,22 +81,22 @@
     function fmtDate(s){try{return new Date(s).toLocaleDateString('ar',{year:'numeric',month:'long',day:'numeric'})}catch(e){return s}}
     fetch('https://api.github.com/repos/'+REPO+'/releases/latest').then(function(r){return r.ok?r.json():null}).then(function(rel){
       if(!rel)return;
-      var apk=null;
-      (rel.assets||[]).forEach(function(a){if(/\.apk$/i.test(a.name)&&(!apk||a.size>apk.size))apk=a});
+      var source=null;
+      (rel.assets||[]).forEach(function(a){if(/source.*\.(zip|tar\.gz)$/i.test(a.name)&&(!source||a.size>source.size))source=a});
       var tag=rel.tag_name||'';
       document.getElementById('version-pill').textContent=tag;
       document.getElementById('release-name').textContent=rel.name||('إصدار '+tag);
       document.getElementById('hero-eyebrow').textContent='أحدث إصدار · '+tag+' · '+fmtDate(rel.published_at);
-      if(apk){
-        document.getElementById('fact-size').textContent=fmtSize(apk.size);
-        document.getElementById('fact-downloads').textContent=(apk.download_count||0).toLocaleString('ar');
+      if(source){
+        document.getElementById('fact-size').textContent=fmtSize(source.size);
+        document.getElementById('fact-downloads').textContent=(source.download_count||0).toLocaleString('ar');
         var btn=document.getElementById('download-btn');
-        btn.href=apk.browser_download_url;
-        btn.setAttribute('download',apk.name);
-        document.getElementById('download-meta').textContent='Android APK · '+fmtSize(apk.size)+' · '+apk.name;
+        btn.href=source.browser_download_url;
+        btn.setAttribute('download',source.name);
+        document.getElementById('download-meta').textContent='مصدر التطبيق ZIP · '+fmtSize(source.size);
       }
       try{localStorage.setItem('yawaqit-latest',tag)}catch(e){}
-    }).catch(function(){document.getElementById('download-meta').textContent='Android APK'});
+    }).catch(function(){document.getElementById('download-meta').textContent='مصدر التطبيق ZIP'});
     fetch('/versions.json').then(function(r){return r.ok?r.json():null}).then(function(v){
       if(!v||!v.sha256)return;
       var el=document.getElementById('checksum-note');
@@ -108,11 +108,11 @@
       if(!list||!list.length)return;
       ul.innerHTML='';
       list.forEach(function(rel){
-        var apk=null;(rel.assets||[]).forEach(function(a){if(/\.apk$/i.test(a.name))apk=a});
+        var source=null;(rel.assets||[]).forEach(function(a){if(/source.*\.(zip|tar\.gz)$/i.test(a.name))source=a});
         var li=document.createElement('li');
         li.className='changelog-item';
         li.innerHTML='<div class="cl-head"><a class="cl-tag" href="'+(rel.html_url||'#')+'" target="_blank" rel="noopener">'+(rel.tag_name||'')+'</a><span class="cl-name">'+(rel.name||'')+'</span><span class="cl-date">'+fmtDate(rel.published_at)+'</span></div>'
-          +(apk?'<a class="cl-dl" href="'+apk.browser_download_url+'" download>تنزيل '+fmtSize(apk.size)+' ↓</a>':'');
+          +(source?'<a class="cl-dl" href="'+source.browser_download_url+'" download>تحميل المصدر '+fmtSize(source.size)+' ↓</a>':'');
         ul.appendChild(li);
       });
     }).catch(function(){var ul=document.getElementById('changelog-list');if(ul)ul.innerHTML='<li class="changelog-loading">تعذر جلب السجل — افتح صفحة الإصدارات.</li>'});
